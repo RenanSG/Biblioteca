@@ -45,23 +45,4 @@ public class LivroController {
         return ResponseEntity.noContent().build(); // Retorna status 204 No Content.
     }
 
-    @PostMapping("/{id}/emprestar")
-    public ResponseEntity<Livro> emprestarLivro(@PathVariable Long id) {
-        try {
-            Livro livroEmprestado = livroService.emprestar(id);
-            return ResponseEntity.ok(livroEmprestado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
-    }
-
-    @PostMapping("/{id}/devolver")
-    public ResponseEntity<Livro> devolverLivro(@PathVariable Long id) {
-        try {
-            Livro livroDevolvido = livroService.devolver(id);
-            return ResponseEntity.ok(livroDevolvido);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
-    }
 }
