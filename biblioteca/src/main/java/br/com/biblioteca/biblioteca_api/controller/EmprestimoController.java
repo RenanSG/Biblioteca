@@ -5,10 +5,7 @@ import br.com.biblioteca.biblioteca_api.model.Emprestimo;
 import br.com.biblioteca.biblioteca_api.service.EmprestimoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/emprestimos")
@@ -25,6 +22,16 @@ public class EmprestimoController {
         try {
             Emprestimo novoEmprestimo = emprestimoService.criarEmprestimo(dto);
             return new ResponseEntity<>(novoEmprestimo, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PatchMapping("/{id}/devolver")
+    public ResponseEntity<Emprestimo> devolver(@PathVariable Long id) {
+        try {
+            Emprestimo emprestimoFinalizado = emprestimoService.finalizarEmprestimo(id);
+            return ResponseEntity.ok(emprestimoFinalizado);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }

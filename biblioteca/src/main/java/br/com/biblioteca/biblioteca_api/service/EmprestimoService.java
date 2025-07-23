@@ -47,4 +47,21 @@ public class EmprestimoService {
 
         return emprestimoRepository.save(emprestimo);
     }
+
+    @Transactional
+    public Emprestimo finalizarEmprestimo(Long emprestimoId) {
+        Emprestimo emprestimo = emprestimoRepository.findById(emprestimoId)
+                .orElseThrow(() -> new RuntimeException("Empréstimo não encontrado!"));
+
+        if (emprestimo.getDataDevolucao() != null) {
+            throw new RuntimeException("Este empréstimo já foi finalizado.");
+        }
+
+        Livro livro = emprestimo.getLivro();
+        livro.setDisponivel(true);
+        livroRepository.save(livro);
+
+        emprestimo.setDataDevolucao(LocalDate.now());
+        return emprestimoRepository.save(emprestimo);
+    }
 }
