@@ -25,8 +25,11 @@ public class LivroController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Livro>> listarTodos() {
-        return ResponseEntity.ok(livroService.buscarTodos()); // Retorna a lista e o status 200 OK.
+    public ResponseEntity<List<Livro>> buscarLivros(
+            @RequestParam(required = false) String titulo,
+            @RequestParam(required = false) String autor,
+            @RequestParam(required = false) String isbn) {
+        return ResponseEntity.ok(livroService.buscar(titulo, autor, isbn));
     }
 
     @GetMapping("/{id}")

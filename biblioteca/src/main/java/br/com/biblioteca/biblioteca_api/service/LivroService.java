@@ -4,6 +4,7 @@ import br.com.biblioteca.biblioteca_api.model.Livro;
 import br.com.biblioteca.biblioteca_api.repository.LivroRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,12 +17,24 @@ public class LivroService {
         this.livroRepository = livroRepository;
     }
 
-    public Livro salvar(Livro livro) {
-        return livroRepository.save(livro);
+    public List<Livro> buscar(String titulo, String autor, String isbn) {
+        if (titulo != null) {
+            return livroRepository.findByTituloContaining(titulo);
+        }
+        if (autor != null) {
+            return livroRepository.findByAutorContaining(autor);
+        }
+        if (isbn != null) {
+            Livro livro = livroRepository.findByIsbn(isbn);
+            // Se o livro for encontrado, retorna uma lista com ele. Se não, uma lista vazia.
+            return livro != null ? List.of(livro) : Collections.emptyList();
+        }
+        // Se nenhum parâmetro for fornecido, retorna todos os livros.
+        return livroRepository.findAll();
     }
 
-    public List<Livro> buscarTodos() {
-        return livroRepository.findAll();
+    public Livro salvar(Livro livro) {
+        return livroRepository.save(livro);
     }
 
     public Optional<Livro> buscarPorId(Long id) {
@@ -56,15 +69,4 @@ public class LivroService {
         return livroRepository.save(livro);
     }
 
-    public List<Livro> buscarPorTitulo(String titulo) {
-        return livroRepository.findByTituloContaining(titulo);
-    }
-
-    public List<Livro> buscarPorAutor(String autor) {
-        return livroRepository.findByAutorContaining(autor);
-    }
-
-    public Livro buscarPorIsbn(String isbn) {
-        return livroRepository.findByIsbn(isbn);
-    }
 }
