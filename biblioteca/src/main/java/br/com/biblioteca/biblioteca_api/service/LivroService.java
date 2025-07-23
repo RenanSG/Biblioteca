@@ -32,6 +32,30 @@ public class LivroService {
         livroRepository.deleteById(id);
     }
 
+    public Livro emprestar(Long id) {
+        Livro livro = buscarPorId(id)
+                .orElseThrow(() -> new RuntimeException("Livro não encontrado!"));
+
+        if (!livro.isDisponivel()) {
+            throw new RuntimeException("Livro já está emprestado!");
+        }
+
+        livro.setDisponivel(false);
+        return livroRepository.save(livro);
+    }
+
+    public Livro devolver(Long id) {
+        Livro livro = buscarPorId(id)
+                .orElseThrow(() -> new RuntimeException("Livro não encontrado!"));
+
+        if (livro.isDisponivel()) {
+            throw new RuntimeException("Livro já está disponível (não pode ser devolvido)!");
+        }
+
+        livro.setDisponivel(true);
+        return livroRepository.save(livro);
+    }
+
     public List<Livro> buscarPorTitulo(String titulo) {
         return livroRepository.findByTituloContaining(titulo);
     }
