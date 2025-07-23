@@ -1,12 +1,12 @@
 package br.com.biblioteca.biblioteca_api;
 
-import br.com.biblioteca.biblioteca_api.dto.CriarEmprestimoDTO;
-import br.com.biblioteca.biblioteca_api.model.Emprestimo; // Import que faltava
-import br.com.biblioteca.biblioteca_api.model.Livro;
-import br.com.biblioteca.biblioteca_api.model.Usuario;
-import br.com.biblioteca.biblioteca_api.repository.EmprestimoRepository; // Campo novo
-import br.com.biblioteca.biblioteca_api.repository.LivroRepository;
-import br.com.biblioteca.biblioteca_api.repository.UsuarioRepository;
+import br.com.biblioteca.biblioteca_api.emprestimo.CriarEmprestimoDTO;
+import br.com.biblioteca.biblioteca_api.emprestimo.Emprestimo;
+import br.com.biblioteca.biblioteca_api.emprestimo.EmprestimoRepository;
+import br.com.biblioteca.biblioteca_api.livro.Livro;
+import br.com.biblioteca.biblioteca_api.livro.LivroRepository;
+import br.com.biblioteca.biblioteca_api.usuario.Usuario;
+import br.com.biblioteca.biblioteca_api.usuario.UsuarioRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDate; // Import que faltava
+
+import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

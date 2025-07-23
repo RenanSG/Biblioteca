@@ -1,6 +1,6 @@
 package br.com.biblioteca.biblioteca_api;
 
-import br.com.biblioteca.biblioteca_api.model.Livro;
+import br.com.biblioteca.biblioteca_api.livro.Livro;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,13 +40,10 @@ class LivroControllerTest {
 
     @Test
     void deveListarTodosOsLivros_E_RetornarStatus200() throws Exception {
-        Livro livro = new Livro(null, "O Hobbit", "J.R.R. Tolkien", "HarperCollins", "978-0261102217", "FISICO", true);
-        mockMvc.perform(post("/livros").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(livro)));
-
         mockMvc.perform(get("/livros"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].titulo").value("O Hobbit"));
+                .andExpect(jsonPath("$[*].titulo", hasItem("O Hobbit")));
     }
 
     @Test

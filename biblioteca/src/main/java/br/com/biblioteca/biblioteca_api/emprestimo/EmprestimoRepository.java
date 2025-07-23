@@ -1,6 +1,5 @@
-package br.com.biblioteca.biblioteca_api.repository;
+package br.com.biblioteca.biblioteca_api.emprestimo;
 
-import br.com.biblioteca.biblioteca_api.model.Emprestimo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;

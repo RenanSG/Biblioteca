@@ -1,4 +1,4 @@
-package br.com.biblioteca.biblioteca_api.model;
+package br.com.biblioteca.biblioteca_api.usuario;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

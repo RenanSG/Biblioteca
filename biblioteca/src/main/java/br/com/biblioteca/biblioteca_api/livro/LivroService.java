@@ -1,7 +1,5 @@
-package br.com.biblioteca.biblioteca_api.service;
+package br.com.biblioteca.biblioteca_api.livro;
 
-import br.com.biblioteca.biblioteca_api.model.Livro;
-import br.com.biblioteca.biblioteca_api.repository.LivroRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;

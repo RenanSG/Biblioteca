@@ -1,8 +1,5 @@
-package br.com.biblioteca.biblioteca_api.controller;
+package br.com.biblioteca.biblioteca_api.emprestimo;
 
-import br.com.biblioteca.biblioteca_api.dto.CriarEmprestimoDTO;
-import br.com.biblioteca.biblioteca_api.model.Emprestimo;
-import br.com.biblioteca.biblioteca_api.service.EmprestimoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

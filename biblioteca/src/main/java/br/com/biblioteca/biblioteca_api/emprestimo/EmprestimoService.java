@@ -1,12 +1,9 @@
-package br.com.biblioteca.biblioteca_api.service;
+package br.com.biblioteca.biblioteca_api.emprestimo;
 
-import br.com.biblioteca.biblioteca_api.dto.CriarEmprestimoDTO;
-import br.com.biblioteca.biblioteca_api.model.Emprestimo;
-import br.com.biblioteca.biblioteca_api.model.Livro;
-import br.com.biblioteca.biblioteca_api.model.Usuario;
-import br.com.biblioteca.biblioteca_api.repository.EmprestimoRepository;
-import br.com.biblioteca.biblioteca_api.repository.LivroRepository;
-import br.com.biblioteca.biblioteca_api.repository.UsuarioRepository;
+import br.com.biblioteca.biblioteca_api.livro.Livro;
+import br.com.biblioteca.biblioteca_api.livro.LivroRepository;
+import br.com.biblioteca.biblioteca_api.usuario.Usuario;
+import br.com.biblioteca.biblioteca_api.usuario.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,7 +72,6 @@ public class EmprestimoService {
         }
         return emprestimoRepository.findAll();
     }
-
 
 
 }

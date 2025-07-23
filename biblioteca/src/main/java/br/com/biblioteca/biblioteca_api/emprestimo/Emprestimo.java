@@ -1,5 +1,7 @@
-package br.com.biblioteca.biblioteca_api.model;
+package br.com.biblioteca.biblioteca_api.emprestimo;
 
+import br.com.biblioteca.biblioteca_api.livro.Livro;
+import br.com.biblioteca.biblioteca_api.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

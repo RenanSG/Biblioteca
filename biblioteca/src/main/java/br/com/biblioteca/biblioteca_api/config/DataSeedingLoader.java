@@ -1,9 +1,9 @@
 package br.com.biblioteca.biblioteca_api.config;
 
-import br.com.biblioteca.biblioteca_api.model.Livro;
-import br.com.biblioteca.biblioteca_api.model.Usuario;
-import br.com.biblioteca.biblioteca_api.repository.LivroRepository;
-import br.com.biblioteca.biblioteca_api.repository.UsuarioRepository;
+import br.com.biblioteca.biblioteca_api.livro.Livro;
+import br.com.biblioteca.biblioteca_api.livro.LivroRepository;
+import br.com.biblioteca.biblioteca_api.usuario.Usuario;
+import br.com.biblioteca.biblioteca_api.usuario.UsuarioRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,5 @@
-package br.com.biblioteca.biblioteca_api.controller;
+package br.com.biblioteca.biblioteca_api.livro;
 
-import br.com.biblioteca.biblioteca_api.model.Livro;
-import br.com.biblioteca.biblioteca_api.service.LivroService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
