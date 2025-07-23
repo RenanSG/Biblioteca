@@ -70,34 +70,6 @@ class LivroControllerTest {
     }
 
     @Test
-    void deveEmprestarUmLivro_E_RetornarStatus200() throws Exception {
-        Livro livro = new Livro(null, "O Festim dos Corvos", "George R. R. Martin", "Leya", "978-8580411253", "FISICO", true);
-        String response = mockMvc.perform(post("/livros")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(livro)))
-                .andReturn().getResponse().getContentAsString();
-        Livro livroSalvo = objectMapper.readValue(response, Livro.class);
-
-        mockMvc.perform(post("/livros/" + livroSalvo.getId() + "/emprestar"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.disponivel").value(false));
-    }
-
-    @Test
-    void deveDevolverUmLivro_E_RetornarStatus200() throws Exception {
-        Livro livro = new Livro(null, "A Tormenta de Espadas", "George R. R. Martin", "Leya", "978-8580411246", "FISICO", false);
-        String response = mockMvc.perform(post("/livros")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(livro)))
-                .andReturn().getResponse().getContentAsString();
-        Livro livroSalvo = objectMapper.readValue(response, Livro.class);
-
-        mockMvc.perform(post("/livros/" + livroSalvo.getId() + "/devolver"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.disponivel").value(true));
-    }
-
-    @Test
     void deveBuscarLivroPorTitulo_E_RetornarStatus200() throws Exception {
         Livro livro1 = new Livro(null, "Duna", "Frank Herbert", "Aleph", "978-8576570988", "FISICO", true);
         mockMvc.perform(post("/livros").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(livro1)));

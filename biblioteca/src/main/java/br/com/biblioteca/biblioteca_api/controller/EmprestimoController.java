@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @RestController
 @RequestMapping("/emprestimos")
 public class EmprestimoController {
@@ -36,4 +39,13 @@ public class EmprestimoController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping
+    public ResponseEntity<List<Emprestimo>> relatorio(
+            @RequestParam(required = false) Long usuarioId,
+            @RequestParam(required = false) LocalDate data) {
+        List<Emprestimo> emprestimos = emprestimoService.listarEmprestimos(usuarioId, data);
+        return ResponseEntity.ok(emprestimos);
+    }
+
 }

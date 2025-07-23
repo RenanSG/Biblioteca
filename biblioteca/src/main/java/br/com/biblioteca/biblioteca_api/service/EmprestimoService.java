@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class EmprestimoService {
@@ -64,4 +65,15 @@ public class EmprestimoService {
         emprestimo.setDataDevolucao(LocalDate.now());
         return emprestimoRepository.save(emprestimo);
     }
+
+    public List<Emprestimo> listarEmprestimos(Long usuarioId, LocalDate data) {
+        if (usuarioId != null) {
+            return emprestimoRepository.findByUsuarioId(usuarioId);
+        }
+        if (data != null) {
+            return emprestimoRepository.findByDataEmprestimo(data);
+        }
+        return emprestimoRepository.findAll();
+    }
+
 }
