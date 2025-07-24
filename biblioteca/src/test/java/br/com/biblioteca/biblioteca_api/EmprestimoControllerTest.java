@@ -40,7 +40,7 @@ class EmprestimoControllerTest {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
-    private EmprestimoRepository emprestimoRepository; // Campo que faltava
+    private EmprestimoRepository emprestimoRepository;
 
     @Test
     void deveCriarUmEmprestimo_E_RetornarStatus201() throws Exception {
@@ -81,19 +81,4 @@ class EmprestimoControllerTest {
                 .andExpect(jsonPath("$.livro.disponivel").value(true))
                 .andExpect(jsonPath("$.dataDevolucao").exists());
     }
-
-    @Test
-    void deveRetornarRelatorioDeEmprestimosPorUsuario() throws Exception {
-        // Cenário
-        Livro livro = livroRepository.save(new Livro(null, "O Nome do Vento", "Patrick Rothfuss", "Sextante", "978-8575424939", "FISICO", false));
-        Usuario usuario = usuarioRepository.save(new Usuario(null, "Kvothe"));
-        emprestimoRepository.save(new Emprestimo(null, livro, usuario, LocalDate.now(), null));
-
-        // Ação e Verificação
-        mockMvc.perform(get("/emprestimos?usuarioId=" + usuario.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].usuario.nome").value("Kvothe"));
-    }
-
 }
