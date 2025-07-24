@@ -81,4 +81,19 @@ class EmprestimoControllerTest {
                 .andExpect(jsonPath("$.livro.disponivel").value(true))
                 .andExpect(jsonPath("$.dataDevolucao").exists());
     }
+
+    // Adicione este método de teste à classe EmprestimoControllerTest
+    @Test
+    void deveRetornarRelatorioDeEmprestimosPorUsuario() throws Exception {
+        // Cenário
+        Livro livro = livroRepository.save(new Livro(null, "O Nome do Vento", "Patrick Rothfuss", "Sextante", "978-8575424939", "FISICO", false));
+        Usuario usuario = usuarioRepository.save(new Usuario(null, "Kvothe"));
+        emprestimoRepository.save(new Emprestimo(null, livro, usuario, LocalDate.now(), null));
+
+        // Ação e Verificação
+        mockMvc.perform(get("/emprestimos?usuarioId=" + usuario.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].usuario.nome").value("Kvothe"));
+    }
 }
