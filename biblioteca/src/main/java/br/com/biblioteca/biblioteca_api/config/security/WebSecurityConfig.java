@@ -67,6 +67,7 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.GET, PUBLIC_MATCHERS_GET).permitAll()
                 .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
                 .requestMatchers(HttpMethod.POST, "/livros").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/livros/**").hasRole("ADMIN") // Adicione esta linha
                 .requestMatchers(HttpMethod.DELETE, "/livros/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
         );

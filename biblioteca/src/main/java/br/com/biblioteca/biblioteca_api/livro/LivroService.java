@@ -1,5 +1,6 @@
 package br.com.biblioteca.biblioteca_api.livro;
 
+import br.com.biblioteca.biblioteca_api.exceptions.ObjectNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -43,4 +44,17 @@ public class LivroService {
         livroRepository.deleteById(id);
     }
 
+    // Adicione este método dentro da classe LivroService...
+    public Livro atualizar(Long id, Livro livroAtualizado) {
+        return buscarPorId(id)
+                .map(livroExistente -> {
+                    livroExistente.setTitulo(livroAtualizado.getTitulo());
+                    livroExistente.setAutor(livroAtualizado.getAutor());
+                    livroExistente.setEditora(livroAtualizado.getEditora());
+                    livroExistente.setIsbn(livroAtualizado.getIsbn());
+                    livroExistente.setTipo(livroAtualizado.getTipo());
+                    return salvar(livroExistente);
+                })
+                .orElseThrow(() -> new ObjectNotFoundException("Livro não encontrado com o ID: " + id));
+    }
 }

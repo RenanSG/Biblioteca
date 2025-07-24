@@ -30,7 +30,6 @@ class LivroControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void deveCriarUmLivro_E_RetornarStatus201() throws Exception {
-        // CORREÇÃO: Removido o argumento 'null' extra no final
         Livro novoLivro = new Livro(null, "A Guerra dos Tronos", "George R. R. Martin", "Leya", "978-8580411239", "FISICO", true);
 
         mockMvc.perform(post("/livros")
@@ -44,7 +43,6 @@ class LivroControllerTest {
     @Test
     @WithMockUser(roles = "CLIENTE")
     void naoDeveCriarUmLivro_QuandoUsuarioNaoForAdmin() throws Exception {
-        // CORREÇÃO: Removido o argumento 'null' extra no final
         Livro novoLivro = new Livro(null, "A Guerra dos Tronos", "George R. R. Martin", "Leya", "978-8580411239", "FISICO", true);
 
         mockMvc.perform(post("/livros")
@@ -64,7 +62,6 @@ class LivroControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void deveDeletarUmLivro_E_RetornarStatus204() throws Exception {
-        // CORREÇÃO: Removido o argumento 'null' extra no final
         Livro livro = new Livro(null, "A Dança dos Dragões", "George R. R. Martin", "Leya", "978-8580411260", "FISICO", true);
         String response = mockMvc.perform(post("/livros")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -75,8 +72,28 @@ class LivroControllerTest {
         mockMvc.perform(delete("/livros/" + livroSalvo.getId()))
                 .andExpect(status().isNoContent());
 
-        // Este teste verifica que o livro não pode mais ser encontrado
         mockMvc.perform(get("/livros/" + livroSalvo.getId()))
                 .andExpect(status().isNotFound());
+    }
+
+    // Adicione este método de teste na classe LivroControllerTest...
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deveAtualizarUmLivro_E_RetornarStatus200() throws Exception {
+        Livro livro = new Livro(null, "O Festim dos Corvos", "George R. R. Martin", "Leya", "978-8580411253", "FISICO", true);
+        String response = mockMvc.perform(post("/livros")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(livro)))
+                .andReturn().getResponse().getContentAsString();
+        Livro livroSalvo = objectMapper.readValue(response, Livro.class);
+
+        Livro livroAtualizado = new Livro(livroSalvo.getId(), "O Festim dos Corvos (Edição Revisada)", "George R. R. Martin", "Suma", "978-8556510278", "FISICO", true);
+
+        mockMvc.perform(put("/livros/" + livroSalvo.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(livroAtualizado)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.titulo").value("O Festim dos Corvos (Edição Revisada)"))
+                .andExpect(jsonPath("$.editora").value("Suma"));
     }
 }

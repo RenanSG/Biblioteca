@@ -22,7 +22,6 @@ public class LivroController {
         return new ResponseEntity<>(novoLivro, HttpStatus.CREATED);
     }
 
-    // Adicione este método dentro da classe LivroController
     @GetMapping
     public ResponseEntity<List<Livro>> buscarLivros(
             @RequestParam(required = false) String titulo,
@@ -42,5 +41,12 @@ public class LivroController {
     public ResponseEntity<Void> deletarLivro(@PathVariable Long id) {
         livroService.deletar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Adicione este método dentro da classe LivroController...
+    @PutMapping("/{id}")
+    public ResponseEntity<Livro> atualizarLivro(@PathVariable Long id, @RequestBody Livro livro) {
+        Livro livroAtualizado = livroService.atualizar(id, livro);
+        return ResponseEntity.ok(livroAtualizado);
     }
 }
