@@ -2,9 +2,9 @@
 
 package br.com.biblioteca.biblioteca_api.livro;
 
-// Adicione a importação da nova entidade
 import br.com.biblioteca.biblioteca_api.autor.Autor;
-import jakarta.persistence.*; // Garanta que esta importação existe
+import br.com.biblioteca.biblioteca_api.categoria.Categoria; // Importe Categoria
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,13 +21,23 @@ public class Livro {
 
     private String titulo;
 
-    // Altere o campo 'autor' para o seguinte
     @ManyToOne
     @JoinColumn(name = "autor_id", nullable = false)
     private Autor autor;
 
+    // Adicione a relação com Categoria
+    @ManyToOne
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
+
     private String editora;
     private String isbn;
-    private String tipo;
+    private Integer anoPublicacao; // Novo campo
+    private Integer numeroPaginas; // Novo campo
+
+    // Mude o tipo para o Enum e anote
+    @Enumerated(EnumType.STRING)
+    private TipoLivro tipo;
+
     private boolean disponivel = true;
 }

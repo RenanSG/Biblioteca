@@ -61,17 +61,25 @@ public class WebSecurityConfig {
         http.addFilter(new JWTAuthenticationFilter(authenticationManager, jwtUtil));
         http.addFilter(new JWTAuthorizationFilter(authenticationManager, jwtUtil, userDetailsService));
 
-        // Substitua o bloco authorizeHttpRequests pelo abaixo
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(PUBLIC_MATCHERS).permitAll()
                 .requestMatchers(HttpMethod.GET, PUBLIC_MATCHERS_GET).permitAll()
                 .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
+                // Adicione as regras para /autores/**
+                .requestMatchers(HttpMethod.GET, "/autores/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/autores").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/autores/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/autores/**").hasRole("ADMIN")
+                // Regras existentes para /livros
                 .requestMatchers(HttpMethod.POST, "/livros").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/livros/**").hasRole("ADMIN") // Adicione esta linha
+                .requestMatchers(HttpMethod.PUT, "/livros/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/livros/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/categorias/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/categorias").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/categorias/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/categorias/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
         );
-
         http.authenticationManager(authenticationManager);
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

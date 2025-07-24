@@ -10,6 +10,10 @@ import br.com.biblioteca.biblioteca_api.usuario.UsuarioRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import br.com.biblioteca.biblioteca_api.categoria.Categoria;
+import br.com.biblioteca.biblioteca_api.categoria.CategoriaRepository;
+import br.com.biblioteca.biblioteca_api.livro.TipoLivro;
+import java.time.LocalDate;
 
 import java.util.List;
 
@@ -21,11 +25,13 @@ public class DataSeedingLoader implements CommandLineRunner {
     private final AutorRepository autorRepository; // Adicione o repositório do autor
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    // Atualize o construtor
-    public DataSeedingLoader(LivroRepository livroRepository, UsuarioRepository usuarioRepository, AutorRepository autorRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    private final CategoriaRepository categoriaRepository;
+
+    public DataSeedingLoader(LivroRepository livroRepository, UsuarioRepository usuarioRepository, AutorRepository autorRepository, CategoriaRepository categoriaRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.livroRepository = livroRepository;
         this.usuarioRepository = usuarioRepository;
         this.autorRepository = autorRepository;
+        this.categoriaRepository = categoriaRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
@@ -33,35 +39,46 @@ public class DataSeedingLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if (livroRepository.count() == 0 && usuarioRepository.count() == 0 && autorRepository.count() == 0) {
             System.out.println("Populando banco de dados com dados iniciais...");
-            popularAutores(); // Adicione esta chamada
+            popularAutores();
+            popularCategorias(); // Adicione esta chamada
             popularLivros();
             popularUsuarios();
             System.out.println("Banco de dados populado com sucesso.");
         }
     }
 
-    // Crie este novo método
     private void popularAutores() {
         autorRepository.saveAll(List.of(
-                new Autor(null, "Frank Herbert"),
-                new Autor(null, "Isaac Asimov"),
-                new Autor(null, "William Gibson"),
-                new Autor(null, "Douglas Adams")
+                new Autor(null, "Frank Herbert", LocalDate.of(1920, 10, 8), "Autor americano de ficção científica, mais conhecido pela série Duna."),
+                new Autor(null, "Isaac Asimov", LocalDate.of(1920, 1, 2), "Escritor e professor de bioquímica, famoso por suas obras de ficção científica e divulgação científica."),
+                new Autor(null, "William Gibson", LocalDate.of(1948, 3, 17), "Considerado o pai do cyberpunk, Gibson cunhou o termo 'ciberespaço'."),
+                new Autor(null, "Douglas Adams", LocalDate.of(1952, 3, 11), "Escritor e comediante britânico, autor de 'O Guia do Mochileiro das Galáxias'.")
+        ));
+    }
+
+    // Crie este novo método
+    private void popularCategorias() {
+        categoriaRepository.saveAll(List.of(
+                new Categoria(null, "Ficção Científica", "Obras que exploram conceitos imaginativos baseados na ciência."),
+                new Categoria(null, "Fantasia", "Gênero com elementos mágicos e sobrenaturais."),
+                new Categoria(null, "Comédia", "Obras com o objetivo de provocar humor e riso.")
         ));
     }
 
     private void popularLivros() {
-        // Busque os autores recém-criados para associá-los aos livros
         Autor herbert = autorRepository.findById(1L).get();
         Autor asimov = autorRepository.findById(2L).get();
         Autor gibson = autorRepository.findById(3L).get();
         Autor adams = autorRepository.findById(4L).get();
 
+        Categoria ficcao = categoriaRepository.findById(1L).get();
+        Categoria comedia = categoriaRepository.findById(3L).get();
+
         livroRepository.saveAll(List.of(
-                new Livro(null, "Duna", herbert, "Aleph", "978-8576570988", "FISICO", true),
-                new Livro(null, "Fundação", asimov, "Aleph", "978-8576570346", "DIGITAL", true),
-                new Livro(null, "Neuromancer", gibson, "Aleph", "978-8576572937", "FISICO", true),
-                new Livro(null, "O Guia do Mochileiro das Galáxias", adams, "Arqueiro", "978-8599296387", "FISICO", true)
+                new Livro(null, "Duna", herbert, ficcao, "Aleph", "978-8576570988", 1965, 688, TipoLivro.FISICO, true),
+                new Livro(null, "Fundação", asimov, ficcao, "Aleph", "978-8576570346", 1951, 240, TipoLivro.DIGITAL, true),
+                new Livro(null, "Neuromancer", gibson, ficcao, "Aleph", "978-8576572937", 1984, 320, TipoLivro.FISICO, true),
+                new Livro(null, "O Guia do Mochileiro das Galáxias", adams, comedia, "Arqueiro", "978-8599296387", 1979, 208, TipoLivro.FISICO, true)
         ));
     }
 

@@ -2,6 +2,8 @@ package br.com.biblioteca.biblioteca_api.livro;
 
 import br.com.biblioteca.biblioteca_api.autor.Autor;
 import br.com.biblioteca.biblioteca_api.autor.AutorRepository;
+import br.com.biblioteca.biblioteca_api.categoria.Categoria;
+import br.com.biblioteca.biblioteca_api.categoria.CategoriaRepository; // Importe
 import br.com.biblioteca.biblioteca_api.exceptions.ObjectNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -13,12 +15,13 @@ import java.util.Optional;
 public class LivroService {
 
     private final LivroRepository livroRepository;
-    private final AutorRepository autorRepository; // Injeção do novo repositório
+    private final AutorRepository autorRepository;
+    private final CategoriaRepository categoriaRepository; // Injeção do novo repositório
 
-    // Atualize o construtor
-    public LivroService(LivroRepository livroRepository, AutorRepository autorRepository) {
+    public LivroService(LivroRepository livroRepository, AutorRepository autorRepository, CategoriaRepository categoriaRepository) {
         this.livroRepository = livroRepository;
         this.autorRepository = autorRepository;
+        this.categoriaRepository = categoriaRepository;
     }
 
     // O método buscar por autor precisa ser ajustado
@@ -41,23 +44,29 @@ public class LivroService {
     public Livro salvar(LivroDTO dto) {
         Autor autor = autorRepository.findById(dto.autorId())
                 .orElseThrow(() -> new ObjectNotFoundException("Autor não encontrado!"));
+        Categoria categoria = categoriaRepository.findById(dto.categoriaId())
+                .orElseThrow(() -> new ObjectNotFoundException("Categoria não encontrada!"));
 
-        Livro livro = new Livro(null, dto.titulo(), autor, dto.editora(), dto.isbn(), dto.tipo(), dto.disponivel());
+        Livro livro = new Livro(null, dto.titulo(), autor, categoria, dto.editora(), dto.isbn(), dto.anoPublicacao(), dto.numeroPaginas(), dto.tipo(), dto.disponivel());
         return livroRepository.save(livro);
     }
 
-    // Altere a assinatura do método 'atualizar' para receber o DTO
     public Livro atualizar(Long id, LivroDTO dto) {
         Livro livroExistente = buscarPorId(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Livro não encontrado com o ID: " + id));
 
         Autor autor = autorRepository.findById(dto.autorId())
                 .orElseThrow(() -> new ObjectNotFoundException("Autor não encontrado!"));
+        Categoria categoria = categoriaRepository.findById(dto.categoriaId())
+                .orElseThrow(() -> new ObjectNotFoundException("Categoria não encontrada!"));
 
         livroExistente.setTitulo(dto.titulo());
         livroExistente.setAutor(autor);
+        livroExistente.setCategoria(categoria);
         livroExistente.setEditora(dto.editora());
         livroExistente.setIsbn(dto.isbn());
+        livroExistente.setAnoPublicacao(dto.anoPublicacao());
+        livroExistente.setNumeroPaginas(dto.numeroPaginas());
         livroExistente.setTipo(dto.tipo());
         livroExistente.setDisponivel(dto.disponivel());
 

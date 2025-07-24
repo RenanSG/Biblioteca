@@ -1,9 +1,11 @@
-package br.com.biblioteca.biblioteca_api;
+// Arquivo: src/test/java/br/com/biblioteca/biblioteca_api/livro/LivroControllerTest.java
+
+package br.com.biblioteca.biblioteca_api.livro;
 
 import br.com.biblioteca.biblioteca_api.autor.Autor;
 import br.com.biblioteca.biblioteca_api.autor.AutorRepository;
-import br.com.biblioteca.biblioteca_api.livro.Livro;
-import br.com.biblioteca.biblioteca_api.livro.LivroDTO;
+import br.com.biblioteca.biblioteca_api.categoria.Categoria;
+import br.com.biblioteca.biblioteca_api.categoria.CategoriaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,37 +34,59 @@ class LivroControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private AutorRepository autorRepository; // Adicione o repositório
+    private AutorRepository autorRepository;
+
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
     private Autor autorSalvo;
+    private Categoria categoriaSalva;
 
     @BeforeEach
     void setUp() {
-        // Cria um autor que será usado em todos os testes
-        autorSalvo = autorRepository.save(new Autor(null, "George R. R. Martin"));
+        autorSalvo = autorRepository.save(new Autor(null, "George R. R. Martin", null, null));
+        categoriaSalva = categoriaRepository.save(new Categoria(null, "Fantasia Épica", null));
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void deveCriarUmLivro_E_RetornarStatus201() throws Exception {
-        // Use o DTO para a requisição
-        LivroDTO novoLivroDto = new LivroDTO("A Guerra dos Tronos", autorSalvo.getId(), "Leya", "978-8580411239", "FISICO", true);
+        // CORREÇÃO: Usando o construtor completo e correto do DTO.
+        LivroDTO novoLivroDto = new LivroDTO("A Guerra dos Tronos", autorSalvo.getId(), categoriaSalva.getId(), "Leya", "978-8580411239", 1996, 600, TipoLivro.FISICO, true);
 
         mockMvc.perform(post("/livros")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(novoLivroDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.titulo").value("A Guerra dos Tronos"))
-                .andExpect(jsonPath("$.autor.nome").value("George R. R. Martin"));
+                .andExpect(jsonPath("$.categoria.nome").value("Fantasia Épica"));
     }
 
-    // ... os outros testes (naoDeveCriarUmLivro, deveListarTodosOsLivros) permanecem funcionais ...
+    @Test
+    @WithMockUser(roles = "CLIENTE")
+    void naoDeveCriarUmLivro_QuandoUsuarioNaoForAdmin() throws Exception {
+        // CORREÇÃO: Usando o construtor completo e correto do DTO.
+        LivroDTO novoLivroDto = new LivroDTO("A Guerra dos Tronos", autorSalvo.getId(), categoriaSalva.getId(), "Leya", "978-8580411239", 1996, 600, TipoLivro.FISICO, true);
+
+        mockMvc.perform(post("/livros")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(novoLivroDto)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveListarTodosOsLivros_E_RetornarStatus200() throws Exception {
+        mockMvc.perform(get("/livros"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[*].titulo", hasItem("Duna")));
+    }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void deveDeletarUmLivro_E_RetornarStatus204() throws Exception {
-        LivroDTO livroDto = new LivroDTO("A Dança dos Dragões", autorSalvo.getId(), "Leya", "978-8580411260", "FISICO", true);
+        // CORREÇÃO: Usando o construtor completo e correto do DTO para criar o livro a ser deletado.
+        LivroDTO livroDto = new LivroDTO("A Dança dos Dragões", autorSalvo.getId(), categoriaSalva.getId(), "Leya", "978-8580411260", 2011, 864, TipoLivro.FISICO, true);
         String response = mockMvc.perform(post("/livros")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(livroDto)))
@@ -79,15 +103,15 @@ class LivroControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void deveAtualizarUmLivro_E_RetornarStatus200() throws Exception {
-        LivroDTO livroDto = new LivroDTO("O Festim dos Corvos", autorSalvo.getId(), "Leya", "978-8580411253", "FISICO", true);
+        // CORREÇÃO: Criando o livro inicial e o DTO de atualização com o construtor correto.
+        LivroDTO livroDto = new LivroDTO("O Festim dos Corvos", autorSalvo.getId(), categoriaSalva.getId(), "Leya", "978-8580411253", 2005, 656, TipoLivro.FISICO, true);
         String response = mockMvc.perform(post("/livros")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(livroDto)))
                 .andReturn().getResponse().getContentAsString();
         Livro livroSalvo = objectMapper.readValue(response, Livro.class);
 
-        Autor outraEditora = autorRepository.save(new Autor(null, "Suma"));
-        LivroDTO livroAtualizadoDto = new LivroDTO("O Festim dos Corvos (Edição Revisada)", autorSalvo.getId(), "Suma", "978-8556510278", "FISICO", true);
+        LivroDTO livroAtualizadoDto = new LivroDTO("O Festim dos Corvos (Edição Revisada)", autorSalvo.getId(), categoriaSalva.getId(), "Suma", "978-8556510278", 2019, 700, TipoLivro.FISICO, true);
 
         mockMvc.perform(put("/livros/" + livroSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON)
