@@ -40,10 +40,36 @@ class LivroControllerTest {
 
     @Test
     void deveListarTodosOsLivros_E_RetornarStatus200() throws Exception {
+        // O DataSeedingLoader já popula o banco, então esperamos encontrar "O Hobbit"
         mockMvc.perform(get("/livros"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[*].titulo", hasItem("O Hobbit")));
+    }
+
+    @Test
+    void deveBuscarLivroPorTitulo_E_RetornarStatus200() throws Exception {
+        mockMvc.perform(get("/livros?titulo=Duna"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].titulo").value("Duna"));
+    }
+
+    // Adicione estes métodos de teste à classe LivroControllerTest
+    @Test
+    void deveBuscarLivroPorAutor_E_RetornarStatus200() throws Exception {
+        mockMvc.perform(get("/livros?autor=Isaac Asimov"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].autor").value("Isaac Asimov"));
+    }
+
+    @Test
+    void deveBuscarLivroPorIsbn_E_RetornarStatus200() throws Exception {
+        mockMvc.perform(get("/livros?isbn=978-8576570988"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].isbn").value("978-8576570988"));
     }
 
     @Test
@@ -67,16 +93,4 @@ class LivroControllerTest {
         mockMvc.perform(get("/livros/" + livroSalvo.getId()))
                 .andExpect(status().isNotFound());
     }
-
-    @Test
-    void deveBuscarLivroPorTitulo_E_RetornarStatus200() throws Exception {
-        Livro livro1 = new Livro(null, "Duna", "Frank Herbert", "Aleph", "978-8576570988", "FISICO", true);
-        mockMvc.perform(post("/livros").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(livro1)));
-
-        mockMvc.perform(get("/livros?titulo=Duna"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].titulo").value("Duna"));
-    }
-
 }

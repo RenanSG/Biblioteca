@@ -19,9 +19,10 @@ public class LivroController {
     @PostMapping
     public ResponseEntity<Livro> criarLivro(@RequestBody Livro livro) {
         Livro novoLivro = livroService.salvar(livro);
-        return new ResponseEntity<>(novoLivro, HttpStatus.CREATED); // Retorna o livro criado e o status 201 Created.
+        return new ResponseEntity<>(novoLivro, HttpStatus.CREATED);
     }
 
+    // Adicione este método dentro da classe LivroController
     @GetMapping
     public ResponseEntity<List<Livro>> buscarLivros(
             @RequestParam(required = false) String titulo,
@@ -33,14 +34,13 @@ public class LivroController {
     @GetMapping("/{id}")
     public ResponseEntity<Livro> buscarPorId(@PathVariable Long id) {
         return livroService.buscarPorId(id)
-                .map(ResponseEntity::ok) // Se encontrar, retorna o livro com status 200 OK.
-                .orElse(ResponseEntity.notFound().build()); // Se não, retorna status 404 Not Found.
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarLivro(@PathVariable Long id) {
         livroService.deletar(id);
-        return ResponseEntity.noContent().build(); // Retorna status 204 No Content.
+        return ResponseEntity.noContent().build();
     }
-
 }
