@@ -82,4 +82,20 @@ class EmprestimoControllerTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].usuario.nome").value("Kvothe"));
     }
+
+    @Test
+    @WithMockUser
+    void naoDeveCriarEmprestimoDeLivroIndisponivel_E_RetornarStatus400() throws Exception {
+        Livro livro = livroRepository.save(new Livro(null, "Snow Crash", "Neal Stephenson", "Editora B", "978-0553380958", "FISICO", false));
+        Usuario usuario = usuarioRepository.save(new Usuario(null, "Hiro Protagonist", "hiro@email.com", "123"));
+        CriarEmprestimoDTO dto = new CriarEmprestimoDTO(livro.getId(), usuario.getId());
+
+        mockMvc.perform(post("/emprestimos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Violação de dados"))
+                .andExpect(jsonPath("$.message").value("Livro já está emprestado!"));
+    }
 }

@@ -19,22 +19,16 @@ public class EmprestimoController {
 
     @PostMapping
     public ResponseEntity<Emprestimo> criar(@RequestBody CriarEmprestimoDTO dto) {
-        try {
-            Emprestimo novoEmprestimo = emprestimoService.criarEmprestimo(dto);
-            return new ResponseEntity<>(novoEmprestimo, HttpStatus.CREATED);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        // Remova o try-catch
+        Emprestimo novoEmprestimo = emprestimoService.criarEmprestimo(dto);
+        return new ResponseEntity<>(novoEmprestimo, HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}/devolver")
     public ResponseEntity<Emprestimo> devolver(@PathVariable Long id) {
-        try {
-            Emprestimo emprestimoFinalizado = emprestimoService.finalizarEmprestimo(id);
-            return ResponseEntity.ok(emprestimoFinalizado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        // Remova o try-catch
+        Emprestimo emprestimoFinalizado = emprestimoService.finalizarEmprestimo(id);
+        return ResponseEntity.ok(emprestimoFinalizado);
     }
 
     @GetMapping

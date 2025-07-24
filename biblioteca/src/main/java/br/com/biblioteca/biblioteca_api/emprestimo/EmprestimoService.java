@@ -6,6 +6,8 @@ import br.com.biblioteca.biblioteca_api.usuario.Usuario;
 import br.com.biblioteca.biblioteca_api.usuario.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import br.com.biblioteca.biblioteca_api.exceptions.DataIntegrityException;
+import br.com.biblioteca.biblioteca_api.exceptions.ObjectNotFoundException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,15 +27,16 @@ public class EmprestimoService {
 
     @Transactional
     public Emprestimo criarEmprestimo(CriarEmprestimoDTO dto) {
+        // Altere as exceções
         Livro livro = livroRepository.findById(dto.livroId())
-                .orElseThrow(() -> new RuntimeException("Livro não encontrado!"));
+                .orElseThrow(() -> new ObjectNotFoundException("Livro não encontrado!"));
 
         if (!livro.isDisponivel()) {
-            throw new RuntimeException("Livro já está emprestado!");
+            throw new DataIntegrityException("Livro já está emprestado!");
         }
 
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+                .orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado!"));
 
         livro.setDisponivel(false);
         livroRepository.save(livro);
@@ -48,11 +51,12 @@ public class EmprestimoService {
 
     @Transactional
     public Emprestimo finalizarEmprestimo(Long emprestimoId) {
+        // Altere as exceções
         Emprestimo emprestimo = emprestimoRepository.findById(emprestimoId)
-                .orElseThrow(() -> new RuntimeException("Empréstimo não encontrado!"));
+                .orElseThrow(() -> new ObjectNotFoundException("Empréstimo não encontrado!"));
 
         if (emprestimo.getDataDevolucao() != null) {
-            throw new RuntimeException("Este empréstimo já foi finalizado.");
+            throw new DataIntegrityException("Este empréstimo já foi finalizado.");
         }
 
         Livro livro = emprestimo.getLivro();
