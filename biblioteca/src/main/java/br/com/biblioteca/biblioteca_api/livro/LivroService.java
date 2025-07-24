@@ -1,5 +1,7 @@
 package br.com.biblioteca.biblioteca_api.livro;
 
+import br.com.biblioteca.biblioteca_api.autor.Autor;
+import br.com.biblioteca.biblioteca_api.autor.AutorRepository;
 import br.com.biblioteca.biblioteca_api.exceptions.ObjectNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -11,29 +13,55 @@ import java.util.Optional;
 public class LivroService {
 
     private final LivroRepository livroRepository;
+    private final AutorRepository autorRepository; // Injeção do novo repositório
 
-    public LivroService(LivroRepository livroRepository) {
+    // Atualize o construtor
+    public LivroService(LivroRepository livroRepository, AutorRepository autorRepository) {
         this.livroRepository = livroRepository;
+        this.autorRepository = autorRepository;
     }
 
+    // O método buscar por autor precisa ser ajustado
     public List<Livro> buscar(String titulo, String autor, String isbn) {
+        if (autor != null) {
+            return livroRepository.findByAutorNomeContaining(autor);
+        }
+        // ... o restante do método permanece igual
         if (titulo != null) {
             return livroRepository.findByTituloContaining(titulo);
         }
-        if (autor != null) {
-            return livroRepository.findByAutorContaining(autor);
-        }
         if (isbn != null) {
             Livro livro = livroRepository.findByIsbn(isbn);
-            // Se o livro for encontrado, retorna uma lista com ele. Se não, uma lista vazia.
             return livro != null ? List.of(livro) : Collections.emptyList();
         }
-        // Se nenhum parâmetro for fornecido, retorna todos os livros.
         return livroRepository.findAll();
     }
 
-    public Livro salvar(Livro livro) {
+    // Altere a assinatura do método 'salvar' para receber o DTO
+    public Livro salvar(LivroDTO dto) {
+        Autor autor = autorRepository.findById(dto.autorId())
+                .orElseThrow(() -> new ObjectNotFoundException("Autor não encontrado!"));
+
+        Livro livro = new Livro(null, dto.titulo(), autor, dto.editora(), dto.isbn(), dto.tipo(), dto.disponivel());
         return livroRepository.save(livro);
+    }
+
+    // Altere a assinatura do método 'atualizar' para receber o DTO
+    public Livro atualizar(Long id, LivroDTO dto) {
+        Livro livroExistente = buscarPorId(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Livro não encontrado com o ID: " + id));
+
+        Autor autor = autorRepository.findById(dto.autorId())
+                .orElseThrow(() -> new ObjectNotFoundException("Autor não encontrado!"));
+
+        livroExistente.setTitulo(dto.titulo());
+        livroExistente.setAutor(autor);
+        livroExistente.setEditora(dto.editora());
+        livroExistente.setIsbn(dto.isbn());
+        livroExistente.setTipo(dto.tipo());
+        livroExistente.setDisponivel(dto.disponivel());
+
+        return livroRepository.save(livroExistente);
     }
 
     public Optional<Livro> buscarPorId(Long id) {
@@ -42,19 +70,5 @@ public class LivroService {
 
     public void deletar(Long id) {
         livroRepository.deleteById(id);
-    }
-
-    // Adicione este método dentro da classe LivroService...
-    public Livro atualizar(Long id, Livro livroAtualizado) {
-        return buscarPorId(id)
-                .map(livroExistente -> {
-                    livroExistente.setTitulo(livroAtualizado.getTitulo());
-                    livroExistente.setAutor(livroAtualizado.getAutor());
-                    livroExistente.setEditora(livroAtualizado.getEditora());
-                    livroExistente.setIsbn(livroAtualizado.getIsbn());
-                    livroExistente.setTipo(livroAtualizado.getTipo());
-                    return salvar(livroExistente);
-                })
-                .orElseThrow(() -> new ObjectNotFoundException("Livro não encontrado com o ID: " + id));
     }
 }

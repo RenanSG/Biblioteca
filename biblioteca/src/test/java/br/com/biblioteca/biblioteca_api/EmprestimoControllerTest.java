@@ -1,5 +1,7 @@
 package br.com.biblioteca.biblioteca_api;
 
+import br.com.biblioteca.biblioteca_api.autor.Autor;
+import br.com.biblioteca.biblioteca_api.autor.AutorRepository;
 import br.com.biblioteca.biblioteca_api.emprestimo.CriarEmprestimoDTO;
 import br.com.biblioteca.biblioteca_api.emprestimo.Emprestimo;
 import br.com.biblioteca.biblioteca_api.emprestimo.EmprestimoRepository;
@@ -43,10 +45,15 @@ class EmprestimoControllerTest {
     @Autowired
     private EmprestimoRepository emprestimoRepository;
 
+    @Autowired
+    private AutorRepository autorRepository; // Adicione o repositório de autor
+
     @Test
     @WithMockUser
     void deveCriarUmEmprestimo_E_RetornarStatus201() throws Exception {
-        Livro livro = livroRepository.save(new Livro(null, "Neuromancer", "William Gibson", "Aleph", "978-8576572937", "FISICO", true));
+        // Crie e salve o Autor primeiro
+        Autor autor = autorRepository.save(new Autor(null, "William Gibson"));
+        Livro livro = livroRepository.save(new Livro(null, "Neuromancer", autor, "Aleph", "978-8576572937", "FISICO", true));
         Usuario usuario = usuarioRepository.save(new Usuario(null, "Case", "case@email.com", "123"));
         CriarEmprestimoDTO dto = new CriarEmprestimoDTO(livro.getId(), usuario.getId());
 
@@ -60,7 +67,9 @@ class EmprestimoControllerTest {
     @Test
     @WithMockUser
     void deveDevolverUmLivroEmprestado_E_RetornarStatus200() throws Exception {
-        Livro livro = livroRepository.save(new Livro(null, "Fahrenheit 451", "Ray Bradbury", "Editora C", "978-0743247221", "FISICO", false));
+        // Crie e salve o Autor primeiro
+        Autor autor = autorRepository.save(new Autor(null, "Ray Bradbury"));
+        Livro livro = livroRepository.save(new Livro(null, "Fahrenheit 451", autor, "Editora C", "978-0743247221", "FISICO", false));
         Usuario usuario = usuarioRepository.save(new Usuario(null, "Guy Montag", "montag@email.com", "123"));
         Emprestimo emprestimo = emprestimoRepository.save(new Emprestimo(null, livro, usuario, LocalDate.now(), null));
 
@@ -73,7 +82,9 @@ class EmprestimoControllerTest {
     @Test
     @WithMockUser
     void deveRetornarRelatorioDeEmprestimosPorUsuario() throws Exception {
-        Livro livro = livroRepository.save(new Livro(null, "O Nome do Vento", "Patrick Rothfuss", "Sextante", "978-8575424939", "FISICO", false));
+        // Crie e salve o Autor primeiro
+        Autor autor = autorRepository.save(new Autor(null, "Patrick Rothfuss"));
+        Livro livro = livroRepository.save(new Livro(null, "O Nome do Vento", autor, "Sextante", "978-8575424939", "FISICO", false));
         Usuario usuario = usuarioRepository.save(new Usuario(null, "Kvothe", "kvothe@email.com", "123"));
         emprestimoRepository.save(new Emprestimo(null, livro, usuario, LocalDate.now(), null));
 
@@ -86,7 +97,9 @@ class EmprestimoControllerTest {
     @Test
     @WithMockUser
     void naoDeveCriarEmprestimoDeLivroIndisponivel_E_RetornarStatus400() throws Exception {
-        Livro livro = livroRepository.save(new Livro(null, "Snow Crash", "Neal Stephenson", "Editora B", "978-0553380958", "FISICO", false));
+        // Crie e salve o Autor primeiro
+        Autor autor = autorRepository.save(new Autor(null, "Neal Stephenson"));
+        Livro livro = livroRepository.save(new Livro(null, "Snow Crash", autor, "Editora B", "978-0553380958", "FISICO", false));
         Usuario usuario = usuarioRepository.save(new Usuario(null, "Hiro Protagonist", "hiro@email.com", "123"));
         CriarEmprestimoDTO dto = new CriarEmprestimoDTO(livro.getId(), usuario.getId());
 

@@ -8,7 +8,8 @@ public interface LivroRepository extends JpaRepository<Livro, Long> {
 
     List<Livro> findByTituloContaining(String titulo);
 
-    List<Livro> findByAutorContaining(String autor);
+    // Altere este método para buscar pelo nome do autor na entidade relacionada
+    List<Livro> findByAutorNomeContaining(String autor);
 
     Livro findByIsbn(String isbn);
 }
