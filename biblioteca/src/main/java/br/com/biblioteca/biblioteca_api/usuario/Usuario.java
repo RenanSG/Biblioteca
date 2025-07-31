@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Data
@@ -28,22 +27,19 @@ public class Usuario {
     @JsonIgnore
     private String senha;
 
+    @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "ROLES")
-    private Set<Integer> roles = new HashSet<>();
-
-    public Set<Roles> getRoles() {
-        return roles.stream().map(Roles::toEnum).collect(Collectors.toSet());
-    }
-
-    public void addRole(Roles role) {
-        roles.add(role.getCod());
-    }
+    @CollectionTable(name = "USUARIO_ROLES")
+    private Set<Roles> roles = new HashSet<>();
 
     public Usuario(Long id, String nome, String email, String senha) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.senha = senha;
+    }
+
+    public void addRole(Roles role) {
+        roles.add(role);
     }
 }

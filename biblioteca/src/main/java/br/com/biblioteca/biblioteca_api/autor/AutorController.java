@@ -1,7 +1,6 @@
-// Arquivo: src/main/java/br/com/biblioteca/biblioteca_api/autor/AutorController.java
-
 package br.com.biblioteca.biblioteca_api.autor;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,14 +29,14 @@ public class AutorController {
     }
 
     @PostMapping
-    public ResponseEntity<Autor> criarAutor(@RequestBody Autor autor) {
-        Autor novoAutor = autorService.salvar(autor);
+    public ResponseEntity<Autor> criarAutor(@Valid @RequestBody AutorDTO dto) {
+        Autor novoAutor = autorService.salvar(dto);
         return new ResponseEntity<>(novoAutor, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Autor> atualizarAutor(@PathVariable Long id, @RequestBody Autor autor) {
-        Autor autorAtualizado = autorService.atualizar(id, autor);
+    public ResponseEntity<Autor> atualizarAutor(@PathVariable Long id, @Valid @RequestBody AutorDTO dto) {
+        Autor autorAtualizado = autorService.atualizar(id, dto);
         return ResponseEntity.ok(autorAtualizado);
     }
 

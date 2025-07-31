@@ -4,13 +4,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -20,68 +20,54 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Adicionar esta anotação
+@EnableMethodSecurity
 public class WebSecurityConfig {
-
-    private final UserDetailsService userDetailsService;
-    private final JWTUtil jwtUtil;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    public WebSecurityConfig(UserDetailsService userDetailsService, JWTUtil jwtUtil, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userDetailsService = userDetailsService;
-        this.jwtUtil = jwtUtil;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
-
-    private static final String[] PUBLIC_MATCHERS = {
-            "/h2-console/**",
-            "/swagger-ui/**", // Liberar Swagger
-            "/v3/api-docs/**"  // Liberar a definição da API do Swagger
-    };
-
-    private static final String[] PUBLIC_MATCHERS_GET = {
-            "/livros/**"
-    };
 
     private static final String[] PUBLIC_MATCHERS_POST = {
             "/usuarios"
     };
 
+    private final UserDetailsService userDetailsService;
+    private final JWTUtil jwtUtil;
+
+    public WebSecurityConfig(UserDetailsService userDetailsService, JWTUtil jwtUtil) {
+        this.userDetailsService = userDetailsService;
+        this.jwtUtil = jwtUtil;
+    }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
-        http.csrf(csrf -> csrf.disable());
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
-        AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        authBuilder.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
-        AuthenticationManager authenticationManager = authBuilder.build();
-
-        http.addFilter(new JWTAuthenticationFilter(authenticationManager, jwtUtil));
-        http.addFilter(new JWTAuthorizationFilter(authenticationManager, jwtUtil, userDetailsService));
-
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(PUBLIC_MATCHERS).permitAll()
-                .requestMatchers(HttpMethod.GET, PUBLIC_MATCHERS_GET).permitAll()
-                .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
-                // Adicione as regras para /autores/**
-                .requestMatchers(HttpMethod.GET, "/autores/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/autores").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/autores/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/autores/**").hasRole("ADMIN")
-                // Regras existentes para /livros
-                .requestMatchers(HttpMethod.POST, "/livros").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/livros/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/livros/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/categorias/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/categorias").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/categorias/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/categorias/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers(
+                "/h2-console/**",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-ui.html"
         );
-        http.authenticationManager(authenticationManager);
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+        http
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/autores", "/categorias", "/livros").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/autores/**", "/categorias/**", "/livros/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/autores/**", "/categorias/**", "/livros/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/autores/**", "/categorias/**", "/livros/**").authenticated()
+                        .requestMatchers("/emprestimos/**").authenticated()
+                        .anyRequest().authenticated()
+                )
+                .addFilter(new JWTAuthenticationFilter(authenticationManager, jwtUtil))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager, jwtUtil, userDetailsService));
 
         return http.build();
     }

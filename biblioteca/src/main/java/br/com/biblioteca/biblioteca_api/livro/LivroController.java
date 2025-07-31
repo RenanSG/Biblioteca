@@ -16,21 +16,18 @@ public class LivroController {
         this.livroService = livroService;
     }
 
-    // Altere a assinatura do método para usar LivroDTO
     @PostMapping
     public ResponseEntity<Livro> criarLivro(@RequestBody LivroDTO dto) {
         Livro novoLivro = livroService.salvar(dto);
         return new ResponseEntity<>(novoLivro, HttpStatus.CREATED);
     }
 
-    // Altere a assinatura do método para usar LivroDTO
     @PutMapping("/{id}")
     public ResponseEntity<Livro> atualizarLivro(@PathVariable Long id, @RequestBody LivroDTO dto) {
         Livro livroAtualizado = livroService.atualizar(id, dto);
         return ResponseEntity.ok(livroAtualizado);
     }
 
-    // O restante dos métodos permanece igual
     @GetMapping
     public ResponseEntity<List<Livro>> buscarLivros(
             @RequestParam(required = false) String titulo,

@@ -3,7 +3,7 @@ package br.com.biblioteca.biblioteca_api.livro;
 import br.com.biblioteca.biblioteca_api.autor.Autor;
 import br.com.biblioteca.biblioteca_api.autor.AutorRepository;
 import br.com.biblioteca.biblioteca_api.categoria.Categoria;
-import br.com.biblioteca.biblioteca_api.categoria.CategoriaRepository; // Importe
+import br.com.biblioteca.biblioteca_api.categoria.CategoriaRepository;
 import br.com.biblioteca.biblioteca_api.exceptions.ObjectNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ public class LivroService {
 
     private final LivroRepository livroRepository;
     private final AutorRepository autorRepository;
-    private final CategoriaRepository categoriaRepository; // Injeção do novo repositório
+    private final CategoriaRepository categoriaRepository;
 
     public LivroService(LivroRepository livroRepository, AutorRepository autorRepository, CategoriaRepository categoriaRepository) {
         this.livroRepository = livroRepository;
@@ -24,12 +24,10 @@ public class LivroService {
         this.categoriaRepository = categoriaRepository;
     }
 
-    // O método buscar por autor precisa ser ajustado
     public List<Livro> buscar(String titulo, String autor, String isbn) {
         if (autor != null) {
             return livroRepository.findByAutorNomeContaining(autor);
         }
-        // ... o restante do método permanece igual
         if (titulo != null) {
             return livroRepository.findByTituloContaining(titulo);
         }
@@ -40,7 +38,6 @@ public class LivroService {
         return livroRepository.findAll();
     }
 
-    // Altere a assinatura do método 'salvar' para receber o DTO
     public Livro salvar(LivroDTO dto) {
         Autor autor = autorRepository.findById(dto.autorId())
                 .orElseThrow(() -> new ObjectNotFoundException("Autor não encontrado!"));
