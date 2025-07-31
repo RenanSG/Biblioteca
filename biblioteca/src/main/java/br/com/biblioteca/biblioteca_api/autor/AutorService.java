@@ -1,5 +1,3 @@
-// Arquivo: src/main/java/br/com/biblioteca/biblioteca_api/autor/AutorService.java
-
 package br.com.biblioteca.biblioteca_api.autor;
 
 import br.com.biblioteca.biblioteca_api.exceptions.ObjectNotFoundException;
@@ -25,16 +23,19 @@ public class AutorService {
                 .orElseThrow(() -> new ObjectNotFoundException("Autor não encontrado com o ID: " + id));
     }
 
-    public Autor salvar(Autor autor) {
+    public Autor salvar(AutorDTO dto) {
+        Autor autor = new Autor();
+        autor.setNome(dto.nome());
+        autor.setDataNascimento(dto.dataNascimento());
+        autor.setBiografia(dto.biografia());
         return autorRepository.save(autor);
     }
 
-    public Autor atualizar(Long id, Autor autorAtualizado) {
+    public Autor atualizar(Long id, AutorDTO dto) {
         Autor autorExistente = buscarPorId(id);
-        // CORREÇÃO: Atualizar todos os campos, não apenas o nome.
-        autorExistente.setNome(autorAtualizado.getNome());
-        autorExistente.setDataNascimento(autorAtualizado.getDataNascimento());
-        autorExistente.setBiografia(autorAtualizado.getBiografia());
+        autorExistente.setNome(dto.nome());
+        autorExistente.setDataNascimento(dto.dataNascimento());
+        autorExistente.setBiografia(dto.biografia());
         return autorRepository.save(autorExistente);
     }
 

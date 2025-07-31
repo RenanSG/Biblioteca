@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,9 +21,13 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Adicionar esta anotação
+@EnableMethodSecurity
 public class WebSecurityConfig {
 
+    // Apenas o endpoint de criação de usuário é público
+    private static final String[] PUBLIC_MATCHERS_POST = {
+            "/usuarios"
+    };
     private final UserDetailsService userDetailsService;
     private final JWTUtil jwtUtil;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -33,20 +38,15 @@ public class WebSecurityConfig {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    private static final String[] PUBLIC_MATCHERS = {
-            "/h2-console/**",
-            "/swagger-ui/**", // Liberar Swagger
-            "/v3/api-docs/**"  // Liberar a definição da API do Swagger
-    };
-
-    private static final String[] PUBLIC_MATCHERS_GET = {
-            "/livros/**"
-    };
-
-    private static final String[] PUBLIC_MATCHERS_POST = {
-            "/usuarios"
-    };
-
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers(
+                "/h2-console/**",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-ui.html"
+        );
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -62,22 +62,16 @@ public class WebSecurityConfig {
         http.addFilter(new JWTAuthorizationFilter(authenticationManager, jwtUtil, userDetailsService));
 
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(PUBLIC_MATCHERS).permitAll()
-                .requestMatchers(HttpMethod.GET, PUBLIC_MATCHERS_GET).permitAll()
-                .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
-                // Adicione as regras para /autores/**
-                .requestMatchers(HttpMethod.GET, "/autores/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/autores").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/autores/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/autores/**").hasRole("ADMIN")
-                // Regras existentes para /livros
-                .requestMatchers(HttpMethod.POST, "/livros").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/livros/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/livros/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/categorias/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/categorias").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/categorias/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/categorias/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll() // Permite o cadastro de novos usuários
+                // Regras de ADMIN para gerenciamento do catálogo
+                .requestMatchers(HttpMethod.POST, "/autores", "/categorias", "/livros").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/autores/**", "/categorias/**", "/livros/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/autores/**", "/categorias/**", "/livros/**").hasRole("ADMIN")
+                // Qualquer usuário autenticado (ADMIN ou CLIENTE) pode visualizar o catálogo
+                .requestMatchers(HttpMethod.GET, "/autores/**", "/categorias/**", "/livros/**").authenticated()
+                // Qualquer usuário autenticado pode acessar os endpoints de empréstimo (regras específicas no serviço)
+                .requestMatchers("/emprestimos/**").authenticated()
+                // Todas as outras requisições devem ser autenticadas
                 .anyRequest().authenticated()
         );
         http.authenticationManager(authenticationManager);

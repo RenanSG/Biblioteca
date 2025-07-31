@@ -23,14 +23,17 @@ public class CategoriaService {
                 .orElseThrow(() -> new ObjectNotFoundException("Categoria não encontrada com o ID: " + id));
     }
 
-    public Categoria salvar(Categoria categoria) {
+    public Categoria salvar(CategoriaDTO dto) {
+        Categoria categoria = new Categoria();
+        categoria.setNome(dto.nome());
+        categoria.setDescricao(dto.descricao());
         return categoriaRepository.save(categoria);
     }
 
-    public Categoria atualizar(Long id, Categoria categoriaAtualizada) {
+    public Categoria atualizar(Long id, CategoriaDTO dto) {
         Categoria categoriaExistente = buscarPorId(id);
-        categoriaExistente.setNome(categoriaAtualizada.getNome());
-        categoriaExistente.setDescricao(categoriaAtualizada.getDescricao());
+        categoriaExistente.setNome(dto.nome());
+        categoriaExistente.setDescricao(dto.descricao());
         return categoriaRepository.save(categoriaExistente);
     }
 

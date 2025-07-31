@@ -3,7 +3,7 @@
 package br.com.biblioteca.biblioteca_api.livro;
 
 import br.com.biblioteca.biblioteca_api.autor.Autor;
-import br.com.biblioteca.biblioteca_api.categoria.Categoria; // Importe Categoria
+import br.com.biblioteca.biblioteca_api.categoria.Categoria;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,17 +25,15 @@ public class Livro {
     @JoinColumn(name = "autor_id", nullable = false)
     private Autor autor;
 
-    // Adicione a relação com Categoria
     @ManyToOne
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
     private String editora;
     private String isbn;
-    private Integer anoPublicacao; // Novo campo
-    private Integer numeroPaginas; // Novo campo
+    private Integer anoPublicacao;
+    private Integer numeroPaginas;
 
-    // Mude o tipo para o Enum e anote
     @Enumerated(EnumType.STRING)
     private TipoLivro tipo;
 

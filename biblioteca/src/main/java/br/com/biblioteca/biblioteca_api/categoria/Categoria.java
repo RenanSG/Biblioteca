@@ -1,5 +1,3 @@
-// Arquivo: src/main/java/br/com/biblioteca/biblioteca_api/categoria/Categoria.java
-
 package br.com.biblioteca.biblioteca_api.categoria;
 
 import jakarta.persistence.Entity;

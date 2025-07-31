@@ -1,5 +1,6 @@
 package br.com.biblioteca.biblioteca_api.categoria;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,14 +29,14 @@ public class CategoriaController {
     }
 
     @PostMapping
-    public ResponseEntity<Categoria> criarCategoria(@RequestBody Categoria categoria) {
-        Categoria novaCategoria = categoriaService.salvar(categoria);
+    public ResponseEntity<Categoria> criarCategoria(@Valid @RequestBody CategoriaDTO dto) {
+        Categoria novaCategoria = categoriaService.salvar(dto);
         return new ResponseEntity<>(novaCategoria, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Categoria> atualizarCategoria(@PathVariable Long id, @RequestBody Categoria categoria) {
-        Categoria categoriaAtualizada = categoriaService.atualizar(id, categoria);
+    public ResponseEntity<Categoria> atualizarCategoria(@PathVariable Long id, @Valid @RequestBody CategoriaDTO dto) {
+        Categoria categoriaAtualizada = categoriaService.atualizar(id, dto);
         return ResponseEntity.ok(categoriaAtualizada);
     }
 
